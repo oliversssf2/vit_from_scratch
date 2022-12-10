@@ -4,7 +4,6 @@ asttokens==2.0.8
 async-timeout==4.0.2
 attrs==22.1.0
 backcall==0.2.0
-certifi @ file:///opt/conda/conda-bld/certifi_1655968806487/work/certifi
 charset-normalizer==2.1.1
 cycler==0.11.0
 datasets==2.4.0
@@ -55,6 +54,7 @@ responses==0.18.0
 six==1.16.0
 stack-data==0.5.0
 tokenizers==0.12.1
+-i https://download.pytorch.org/whl/cu116
 torch==1.12.1+cu116
 torchaudio==0.12.1+cu116
 torchsummary==1.5.1
@@ -67,7 +67,7 @@ traitlets==5.3.0
 transformers==4.21.3
 typing_extensions==4.3.0
 urllib3==1.26.12
--e git+https://github.com/oliversssf2/vit_from_scratch.git@65f0e0670f6439fbae09452ecfdd546df447a356#egg=vit
+# -e git+https://github.com/oliversssf2/vit_from_scratch.git@65f0e0670f6439fbae09452ecfdd546df447a356#egg=vit
 wcwidth==0.2.5
 xxhash==3.0.0
 yarl==1.8.1

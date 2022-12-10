@@ -46,7 +46,7 @@ class EncoderStack(nn.Module):
         return x
 
 class TransformerEncoder(nn.Module):
-    def __init__(self, vocab_size, d_model, num_layer, num_head, d_k, dropout_rate):
+    def __init__(self, vocab_size, d_model, num_layer, num_head, d_k, dropout_rate, max_len=512):
         super().__init__()
 
         self.vocab_size = vocab_size
@@ -59,7 +59,7 @@ class TransformerEncoder(nn.Module):
         # See: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html
         # [batch_size, seq_len] -> [batch_size, seq_len, d_model]
         self.embedding = nn.Embedding(self.vocab_size, self.d_model)
-        self.positional_encoding = PositionalEncoding(dropout_rate)
+        self.positional_encoding = PositionalEncoding(dropout_rate, d_model, max_len)
         self.layers = EncoderStack(self.num_layer, self.d_model, self.num_head, self.d_k, dropout_rate)
 
     def forward(self, x, attn_mask):
@@ -79,6 +79,7 @@ class TransformerEncoderClassifer(nn.Module):
         d_k, 
         dropout_rate,
         num_class,
+        max_len
     ) -> None:
         super().__init__()
         self.encoder = TransformerEncoder(
@@ -88,6 +89,7 @@ class TransformerEncoderClassifer(nn.Module):
             num_head=num_head, 
             d_k=d_k, 
             dropout_rate=dropout_rate,
+            max_len=max_len
         )
         self.pre_classifier = nn.Linear(d_model, d_model)
         self.classifier = nn.Linear(d_model, num_class)

@@ -12,10 +12,9 @@
           "WORKSPACE_PATH": "${containerWorkspaceFolder}"
         }
     },
-    
     "runArgs": [
         "--gpus=all",
-        "--shm-size=16g"		
+        "--shm-size=８g"		
     ],
     
     "features": {
@@ -24,11 +23,11 @@
         },
         "ghcr.io/devcontainers/features/github-cli:1": {
           "version": "latest"
-        },
+        }
         
-        "ghcr.io/devcontainers/features/azure-cli:1": {
-          "version": "latest"
-        }  
+        // "ghcr.io/devcontainers/features/azure-cli:1": {
+        //   "version": "latest"
+        // }  
       },
       "customizations": {
         "vscode": {

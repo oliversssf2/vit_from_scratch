@@ -1,3 +1,7 @@
+import os
+os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
+
+
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader
@@ -10,7 +14,7 @@ from tqdm import tqdm # tqdm is a python progress bar library
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
 # Training configurations
-num_epoch = 100
+num_epoch = 20
 learning_rate = 1e-5
 optimizer = 'adam'
 device='cuda:0'
@@ -20,9 +24,9 @@ batch_size=150
 
 # Model configurations
 vocab_size=tokenizer.vocab_size
-d_model=256
+d_model=128
 num_layer=2
-num_head=8
+num_head=2
 d_k=32
 dropout_rate=0.1
 num_class=2
@@ -71,7 +75,8 @@ classifier = TransformerEncoderClassifer(
     num_head=num_head,
     d_k=d_k,
     dropout_rate=dropout_rate,
-    num_class=num_class
+    num_class=num_class,
+    max_len=512
 ).to(device)
 
 optimizer = Adam(classifier.parameters(), lr=learning_rate)
@@ -80,6 +85,9 @@ optimizer = Adam(classifier.parameters(), lr=learning_rate)
 for i in range(num_epoch):
     # Train
     with tqdm(train_dataloader) as train_epoch:
+        train_acc_correct = 0
+        train_total = 0
+
         for batch_id, batch in enumerate(train_epoch):
             input_ids, attn_mask, labels = batch['input_ids'].to(device), batch['attn_mask'].to(device), batch['labels'].to(device)
             # attn_mask = batch['attn_mask'].to(device)
@@ -95,6 +103,7 @@ for i in range(num_epoch):
 
             predictions = outputs.argmax(dim=1, keepdim=True).squeeze()
             correct = (predictions == labels).sum().item()
+            train_acc_correct += correct    
             accuracy = correct / batch_size
 
             loss.backward()
@@ -107,8 +116,12 @@ for i in range(num_epoch):
                 'Loss': loss.item(), 
                 'Accuracy': accuracy
             })
+    print(f"Train Epoch {i} Accuracy: {train_acc_correct/(len(train_dataloader)*batch_size)}")
     # Validate
     with tqdm(test_dataloader) as test_epoch:
+        val_acc_correct = 0
+
+
         for batch_id, batch in enumerate(test_epoch):
             # if batch_id > 3:
             #     break
@@ -125,6 +138,8 @@ for i in range(num_epoch):
 
             predictions = outputs.argmax(dim=1, keepdim=True).squeeze()
             correct = (predictions == labels).sum().item()
+            val_acc_correct += correct
+            
             accuracy = correct / batch_size
 
             test_epoch.set_description(f"Test Epoch {i}")
@@ -132,4 +147,7 @@ for i in range(num_epoch):
                 'Loss': loss.item(), 
                 'Accuracy': accuracy
             })
+    print(f"Test Epoch {i} Accuracy: {val_acc_correct/(len(test_dataloader)*batch_size)}")
 
+
+torch.save(classifier.state_dict(), 'models')
